@@ -35,5 +35,11 @@ cd CSharpTemplate.Solution
 * Any known issues
 
 
+## License
+
+* MIT
+
 ## Copyright
+
+&copy Joseph Jack 2022
 
