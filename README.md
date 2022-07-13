@@ -41,5 +41,5 @@ cd CSharpTemplate.Solution
 
 ## Copyright
 
-&copy Joseph Jack 2022
+&copy; Joseph Jack 2022
 
