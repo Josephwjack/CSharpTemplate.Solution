@@ -3,44 +3,62 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-//Use namespace that reflects name of project
-namespace Template 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using PROJECTNAME.Models;
+
+namespace PROJECTNAME
 {
   public class Startup
   {
-    //This constructor will create an iteration of the Startup class that contains specific settings and variables to run our project 
     public Startup(IWebHostEnvironment env)
     {
       var builder = new ConfigurationBuilder()
           .SetBasePath(env.ContentRootPath)
-          .AddEnvironmentVariables();
+          .AddEnvironmentVariables()
+          .AddJsonFile("appsettings.json");
       Configuration = builder.Build();
     }
-    //This is part of adding custom configurations to our project
-    public IConfigurationRoot Configuration { get; }
+
+    public IConfigurationRoot Configuration { get; set; }
 
     public void ConfigureServices(IServiceCollection services)
     {
-      //Adds MVC service to project
       services.AddMvc();
+      services.AddEntityFrameworkMySql()
+        .AddDbContext<PROJECTNAMEContext>(options => options
+        .UseMySql(Configuration["ConnectionStrings:DefaultConnection"], ServerVersion.AutoDetect(Configuration["ConnectionStrings:DefaultConnection"])));
+      services.AddIdentity<ApplicationUser, IdentityRole>()
+              .AddEntityFrameworkStores<PROJECTNAMEContext>()
+              .AddDefaultTokenProviders();
+      services.Configure<IdentityOptions>(options =>
+      {
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 0;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredUniqueChars = 0;
+      });
     }
-    //responsible for telling our app how to handle requests to the server
+
     public void Configure(IApplicationBuilder app)
     {
-
-      app.UseDeveloperExceptionPage(); 
-      
+      app.UseDeveloperExceptionPage();
+      app.UseAuthentication();
       app.UseRouting();
 
+      app.UseAuthorization();
       app.UseEndpoints(routes =>
       {
         routes.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
       });
-
+      app.UseStaticFiles();
       app.Run(async (context) =>
       {
-        await context.Response.WriteAsync("Hello World!");
+        await context.Response.WriteAsync("View not found.");
       });
     }
   }
+
 }
